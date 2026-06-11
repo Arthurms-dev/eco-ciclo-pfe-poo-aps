@@ -63,8 +63,6 @@ public class SchedulingService {
         scheduling.setEnderecoColeta(dto.getEnderecoColeta());
         scheduling.setStatusEnum(StatusEnum.PENDENTE);
         scheduling.setUser(user);
-        
-        // 👇 SALVAMOS A QUANTIDADE AQUI PARA PODER REVERTER NO FUTURO
         scheduling.setQuantidade(dto.getQuantidade());
 
         if (dto.getWasteId() != null) {

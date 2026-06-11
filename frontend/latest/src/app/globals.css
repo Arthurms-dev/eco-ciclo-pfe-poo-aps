@@ -29,8 +29,6 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
-
-  /* 🚀 ADICIONADO: Configuração de animação nativa do Tailwind v4 */
   --animate-shake: shake 0.4s ease-in-out;
 
   @keyframes shake {
