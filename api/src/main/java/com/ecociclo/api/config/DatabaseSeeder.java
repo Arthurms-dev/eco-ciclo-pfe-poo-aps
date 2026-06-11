@@ -18,7 +18,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (collectionPointRepository.count() == 0) {
-            System.out.println("🌱 [EcoCiclo] Banco de dados vazio. Criando pontos de coleta padrão...");
+            System.out.println("🌱 [EcoCiclo] Banco de dados vazio. Criando pontos de coleta padrão em Recife...");
 
             CollectionPoint ponto1 = new CollectionPoint();
             ponto1.setNomeUnidade("Ecoponto Ilha do Leite"); 
@@ -31,7 +31,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             CollectionPoint ponto2 = new CollectionPoint();
             ponto2.setNomeUnidade("Ecoponto Boa Viagem");
-            ponto2.setEndereco("Av. Boa Viagem, 2000");
+            ponto2.setEndereco("Av. Boa Viagem, 2000 - Boa Viagem");
             ponto2.setLatitude(-8.1185); 
             ponto2.setLongitude(-34.8981);
             ponto2.setCapacidadeMax(300.0);
@@ -40,16 +40,34 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             CollectionPoint ponto3 = new CollectionPoint();
             ponto3.setNomeUnidade("Ecoponto Bairro do Recife");
-            ponto3.setEndereco("Rua do Bom Jesus, 150");
+            ponto3.setEndereco("Rua do Bom Jesus, 150 - Bairro do Recife");
             ponto3.setLatitude(-8.0617);
             ponto3.setLongitude(-34.8710);
             ponto3.setCapacidadeMax(400.0);
             ponto3.setVolumeAtual(100.0);
             ponto3.setTiposResiduosAceitos("Papel, Vidro, Óleo");
 
-            collectionPointRepository.saveAll(Arrays.asList(ponto1, ponto2, ponto3));
+            CollectionPoint ponto4 = new CollectionPoint();
+            ponto4.setNomeUnidade("Ecoponto Praça de Casa Forte");
+            ponto4.setEndereco("Praça de Casa Forte, s/n - Casa Forte");
+            ponto4.setLatitude(-8.0381); 
+            ponto4.setLongitude(-34.9192);
+            ponto4.setCapacidadeMax(600.0);
+            ponto4.setVolumeAtual(250.0);
+            ponto4.setTiposResiduosAceitos("Plástico, Metal, Papelão");
+
+            CollectionPoint ponto5 = new CollectionPoint();
+            ponto5.setNomeUnidade("Ecoponto CDU / UFPE");
+            ponto5.setEndereco("Av. Prof. Artur de Sá, 300 - Cidade Universitária");
+            ponto5.setLatitude(-8.0493); 
+            ponto5.setLongitude(-34.9511);
+            ponto5.setCapacidadeMax(1000.0);
+            ponto5.setVolumeAtual(400.0);
+            ponto5.setTiposResiduosAceitos("Eletrônicos, Baterias, Vidro");
+
+            collectionPointRepository.saveAll(Arrays.asList(ponto1, ponto2, ponto3, ponto4, ponto5));
             
-            System.out.println("✅ [EcoCiclo] Pontos de coleta criados com sucesso!");
+            System.out.println("✅ [EcoCiclo] 5 Pontos de coleta criados com sucesso!");
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.ecociclo.api.service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,9 @@ public class SchedulingService {
     @Transactional 
     public Scheduling createScheduling(SchedulingDto dto) {
 
-        if (dto.getDataHora().isBefore(LocalDateTime.now())) {
+        LocalDateTime agoraLocal = LocalDateTime.now(ZoneId.of("America/Recife"));
+
+        if (dto.getDataHora().isBefore(agoraLocal)) {
             throw new RuntimeException("Não é permitido criar agendamentos em datas ou horários passados.");
         }
 
@@ -56,6 +59,10 @@ public class SchedulingService {
 
         user.setTotalPontos((user.getTotalPontos() == null ? 0 : user.getTotalPontos()) + pontosBase);
         user.setTotalResiduosKg((user.getTotalResiduosKg() == null ? 0 : user.getTotalResiduosKg()) + dto.getQuantidade());
+        
+        int streakAtual = user.getStreak() != null ? user.getStreak() : 0;
+        user.setStreak(streakAtual + 1);
+
         userRepository.save(user);
 
         Scheduling scheduling = new Scheduling();
@@ -64,6 +71,8 @@ public class SchedulingService {
         scheduling.setStatusEnum(StatusEnum.PENDENTE);
         scheduling.setUser(user);
         scheduling.setQuantidade(dto.getQuantidade());
+        
+        scheduling.setPontoColetaId(ponto.getId());
 
         if (dto.getWasteId() != null) {
             wasteItemRepository.findById(dto.getWasteId()).ifPresent(scheduling::setWasteItem);
@@ -80,7 +89,10 @@ public class SchedulingService {
     public void delete(Long id) {
         Scheduling agendamento = schedulingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado com o ID: " + id));
-        if (agendamento.getDataHora() != null && agendamento.getDataHora().isAfter(LocalDateTime.now())) {
+                
+        LocalDateTime agoraLocal = LocalDateTime.now(ZoneId.of("America/Recife"));
+
+        if (agendamento.getDataHora() != null && agendamento.getDataHora().isAfter(agoraLocal)) {
             User user = agendamento.getUser();
 
             if (user != null) {
@@ -92,22 +104,25 @@ public class SchedulingService {
                 }
 
                 int saldoAtual = user.getTotalPontos() != null ? user.getTotalPontos() : 0;
-                long totalAgendamentos = schedulingRepository.findAll().stream()
-                        .filter(s -> s.getUser() != null && s.getUser().getId().equals(user.getId()))
-                        .count();
-
-                if (saldoAtual < pontosGanhos) {
-                    if (totalAgendamentos > 1) {
-                        user.setTotalPontos(0);
-                    }
-                } else {
-                    user.setTotalPontos(saldoAtual - pontosGanhos);
-                }
+                user.setTotalPontos(Math.max(0, saldoAtual - pontosGanhos));
 
                 double totalKg = user.getTotalResiduosKg() != null ? user.getTotalResiduosKg() : 0.0;
                 user.setTotalResiduosKg(Math.max(0.0, totalKg - quantidade));
+                
+                int streakAtual = user.getStreak() != null ? user.getStreak() : 0;
+                user.setStreak(Math.max(0, streakAtual - 1));
 
                 userRepository.save(user);
+            }
+            
+            if (agendamento.getPontoColetaId() != null) {
+                collectionPointRepository.findById(agendamento.getPontoColetaId()).ifPresent(ponto -> {
+                    double volumeAtual = ponto.getVolumeAtual() != null ? ponto.getVolumeAtual() : 0.0;
+                    double quantidadeCancelada = agendamento.getQuantidade() != null ? agendamento.getQuantidade().doubleValue() : 0.0;
+                    
+                    ponto.setVolumeAtual(Math.max(0.0, volumeAtual - quantidadeCancelada));
+                    collectionPointRepository.save(ponto);
+                });
             }
         }
 

@@ -14,12 +14,13 @@ public class CollectionSimulationTask {
     @Autowired
     private CollectionPointRepository repository;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 100000)
     public void simularCaminhaoDeColeta() {
         List<CollectionPoint> pontos = repository.findAll();
         if (pontos.isEmpty()) {
             return;
         }
+
         boolean todosVazios = true;
         for (CollectionPoint ponto : pontos) {
             if (ponto.getVolumeAtual() != null && ponto.getVolumeAtual() > 0) {
@@ -27,18 +28,24 @@ public class CollectionSimulationTask {
                 break; 
             }
         }
+
         if (todosVazios) {
             System.out.println("🔄 [EcoCiclo] Todos os pontos estão vazios! A reiniciar a simulação...");
             
             for (CollectionPoint ponto : pontos) {
-                ponto.setVolumeAtual(100.0); 
+                if (ponto.getNomeUnidade().contains("Ilha do Leite")) ponto.setVolumeAtual(100.0);
+                else if (ponto.getNomeUnidade().contains("Boa Viagem")) ponto.setVolumeAtual(80.0);
+                else if (ponto.getNomeUnidade().contains("Bairro do Recife")) ponto.setVolumeAtual(100.0);
+                else if (ponto.getNomeUnidade().contains("Casa Forte")) ponto.setVolumeAtual(250.0);
+                else if (ponto.getNomeUnidade().contains("UFPE")) ponto.setVolumeAtual(400.0);
+                else ponto.setVolumeAtual(100.0); 
             }
             
             repository.saveAll(pontos);
-            System.out.println("♻️ [EcoCiclo] Pontos recarregados. O ciclo de limpeza recomeça no próximo minuto!");
-            
+            System.out.println("♻️ [EcoCiclo] Pontos recarregados. O ciclo recomeça!");
             return; 
         }
+
         System.out.println("🚛 [EcoCiclo] O camião de recolha está a passar... Limpeza gradual!");
         boolean houveAlteracao = false;
         

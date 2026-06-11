@@ -110,6 +110,13 @@ export default function PerfilPage() {
       if (response.ok || response.status === 204) {
         toast.success("Agendamento cancelado!");
         mutate();
+
+        const userResponse = await fetch(`${API_URL}/api/usuarios/${usuarioLogado.id}`);
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          atualizarSessaoLocal(userData);
+        }
+        
       } else {
         const text = await response.text();
         console.error("Erro do servidor:", text);

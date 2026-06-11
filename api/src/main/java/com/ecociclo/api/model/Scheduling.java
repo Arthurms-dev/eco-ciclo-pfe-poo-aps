@@ -14,6 +14,8 @@ public class Scheduling {
     private LocalDateTime dataHora;
     private String enderecoColeta;
     private Integer quantidade;
+    @Column(name = "ponto_coleta_id")
+    private Long pontoColetaId;
 
     @Enumerated(EnumType.STRING)
     private StatusEnum statusEnum;
@@ -25,6 +27,7 @@ public class Scheduling {
     @ManyToOne
     @JoinColumn(name = "fk_waste")
     private WasteItem wasteItem;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     
@@ -37,6 +40,9 @@ public class Scheduling {
     public Integer getQuantidade() { return quantidade; }
     public void setQuantidade(Integer quantidade) { this.quantidade = quantidade; }
     
+    public Long getPontoColetaId() { return pontoColetaId; }
+    public void setPontoColetaId(Long pontoColetaId) { this.pontoColetaId = pontoColetaId; }
+
     public StatusEnum getStatusEnum() { return statusEnum; }
     public void setStatusEnum(StatusEnum statusEnum) { this.statusEnum = statusEnum; }
     

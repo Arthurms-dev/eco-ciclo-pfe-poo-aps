@@ -45,6 +45,14 @@ public class UserController {
             .orElse(ResponseEntity.status(404).body("Usuário não encontrado."));
     }
 
+    @GetMapping("/ranking")
+    public ResponseEntity<List<UserResponseDTO>> obterRanking() {
+        return ResponseEntity.ok(service.listarTop3Ranking());
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(new UserResponseDTO(service.buscarPorId(id)));
+    }
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> listarTodos() {
         return ResponseEntity.ok(service.listarTodos());

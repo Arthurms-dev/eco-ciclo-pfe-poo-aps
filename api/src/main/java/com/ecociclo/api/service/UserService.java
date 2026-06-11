@@ -78,4 +78,9 @@ public class UserService {
         user.setUltimaAtividade(hoje);
         repository.save(user);
     }
+    public List<UserResponseDTO> listarTop3Ranking() {
+        return repository.findTop3ByOrderByStreakDesc().stream()
+                .map(UserResponseDTO::new)
+                .toList();
+    }
 }

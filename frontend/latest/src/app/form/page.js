@@ -134,7 +134,8 @@ export default function FormAgendamento({ onAgendamentoSucesso }) {
         const usuarioAtualizado = {
           ...usuarioLogado,
           totalResiduosKg: (usuarioLogado.totalResiduosKg || 0) + Number(quantidade),
-          totalPontos: (usuarioLogado.totalPontos || 0) + pontosGanhos
+          totalPontos: (usuarioLogado.totalPontos || 0) + pontosGanhos,
+          streak: (usuarioLogado.streak || 0) + 1
         };
         
         if (atualizarSessaoLocal) {
