@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
   }, []);
 
   const rotasDeAutenticacao = ['/login', '/register'];
-  const rotasPublicas = ['/', '/termos', '/privacidade'];
+  const rotasPublicas = ['/', '/Termos', '/Privacidade'];
   const ehRotaPublicaSimples = rotasPublicas.includes(pathname);
   const mostraBarrasDoSistema = montado && !rotasDeAutenticacao.includes(pathname) && (!ehRotaPublicaSimples || !!usuario);
   const mostraFooter = montado && !rotasDeAutenticacao.includes(pathname);
