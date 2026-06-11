@@ -14,7 +14,7 @@ export default function AuthGuard({ children }) {
   useEffect(() => {
     setIsHydrated(true);
   }, []);
-  const rotasPublicas = ['/', '/login', '/register', '/termos', '/privacidade'];
+  const rotasPublicas = ['/', '/login', '/register', '/Termos', '/Privacidade'];
   const ehRotaPublica = rotasPublicas.includes(pathname);
 
   useEffect(() => {
