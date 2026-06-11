@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../store/useAuthStore';
 import Link from 'next/link';
-import { Leaf } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
