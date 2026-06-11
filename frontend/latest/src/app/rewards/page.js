@@ -4,9 +4,17 @@ import * as React from "react";
 import { useState } from "react";
 import { Award, Ticket, CheckCircle, Copy, Info, ShoppingBag, Check } from "lucide-react";
 import { toast } from "sonner";
+import { useAuthStore } from "../../store/useAuthStore";
+
+const API_URL = 'https://eco-ciclo-pfe-poo-aps-backend.onrender.com';
 
 export default function RecompensasPage() {
-  const [saldoPontos, setSaldoPontos] = useState(1250);
+  const usuarioLogado = useAuthStore((state) => state.user);
+  const atualizarSessaoLocal = useAuthStore((state) => state.login || state.setUser);
+  
+  
+  const saldoPontos = usuarioLogado?.totalPontos || 0;
+
   const [meusCupons, setMeusCupons] = useState([]);
 
   const [recompensas] = useState([
@@ -44,26 +52,49 @@ export default function RecompensasPage() {
     },
   ]);
 
-  const handleResgatar = (item) => {
+  const handleResgatar = async (item) => {
+    if (!usuarioLogado) {
+      toast.error("Você precisa estar logado para resgatar prêmios.");
+      return;
+    }
+
     if (saldoPontos < item.pontos) {
       toast.error("Pontos ECO insuficientes para realizar este resgate.");
       return;
     }
 
-    setSaldoPontos((prev) => prev - item.pontos);
-    const codigoGerado = `ECO-${Math.floor(1000 + Math.random() * 9000)}`;
+    const novoSaldo = saldoPontos - item.pontos;
+    const usuarioAtualizado = { ...usuarioLogado, totalPontos: novoSaldo };
 
-    const novoCupom = {
-      idResgate: Date.now(),
-      titulo: item.titulo,
-      empresa: item.empresa,
-      codigo: codigoGerado,
-      comoUsar: item.comoUsar,
-      data: new Date().toLocaleDateString('pt-BR')
-    };
+    try {
+      const response = await fetch(`${API_URL}/api/usuarios/${usuarioLogado.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(usuarioAtualizado)
+      });
 
-    setMeusCupons((prev) => [novoCupom, ...prev]);
-    toast.success(`Cupom "${item.titulo}" resgatado com sucesso! Veja-o abaixo.`);
+      if (response.ok) {
+        if (atualizarSessaoLocal) atualizarSessaoLocal(usuarioAtualizado);
+        
+        const codigoGerado = `ECO-${Math.floor(1000 + Math.random() * 9000)}`;
+        const novoCupom = {
+          idResgate: Date.now(),
+          titulo: item.titulo,
+          empresa: item.empresa,
+          codigo: codigoGerado,
+          comoUsar: item.comoUsar,
+          data: new Date().toLocaleDateString('pt-BR')
+        };
+
+        setMeusCupons((prev) => [novoCupom, ...prev]);
+        toast.success(`Cupom "${item.titulo}" resgatado com sucesso! Veja-o abaixo.`);
+      } else {
+        toast.error("Erro no servidor ao tentar abater os pontos.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Falha na comunicação com o servidor.");
+    }
   };
 
   const copiarCodigo = (codigo) => {
@@ -77,6 +108,13 @@ export default function RecompensasPage() {
     setMeusCupons((prev) => prev.filter(cupom => cupom.idResgate !== idResgate));
     toast.success(`Cupom "${titulo}" aplicado e utilizado com sucesso!`);
   };
+  if (!usuarioLogado) {
+    return (
+      <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7d9b76]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f0e8] p-6 md:p-12 font-sans text-[#1a2421]">

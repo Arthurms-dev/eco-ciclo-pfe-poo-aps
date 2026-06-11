@@ -20,7 +20,7 @@ import com.ecociclo.api.service.SchedulingService;
 
 @RestController
 @RequestMapping("/api/agendamentos") 
-@CrossOrigin(origins = "eco-ciclo-pfe-poo.vercel.app")
+@CrossOrigin(origins = "*")
 public class SchedulingController {
 
     @Autowired

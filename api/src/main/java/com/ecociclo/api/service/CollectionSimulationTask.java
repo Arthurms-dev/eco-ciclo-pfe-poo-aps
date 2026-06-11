@@ -14,9 +14,9 @@ public class CollectionSimulationTask {
     @Autowired
     private CollectionPointRepository repository;
 
-    @Scheduled(fixedRate = 60000) 
+    @Scheduled(fixedRate = 60000)
     public void simularCaminhaoDeColeta() {
-        System.out.println("🚛 [EcoCiclo] O camião de recolha está a passar... A esvaziar os pontos!");
+        System.out.println("🚛 [EcoCiclo] O camião de recolha está a passar... Limpeza gradual!");
 
         List<CollectionPoint> pontos = repository.findAll();
         boolean houveAlteracao = false;
@@ -24,16 +24,25 @@ public class CollectionSimulationTask {
         for (CollectionPoint ponto : pontos) {
             if (ponto.getVolumeAtual() != null && ponto.getVolumeAtual() > 0) {
                 
-                ponto.setVolumeAtual(ponto.getVolumeAtual() / 3);
-                houveAlteracao = true;
+                double novoVolume = ponto.getVolumeAtual() - (ponto.getVolumeAtual() * 0.20);
+                
+                if (novoVolume < 1.0) {
+                    novoVolume = 0.0;
+                }
+                novoVolume = Math.round(novoVolume * 10.0) / 10.0;
+                
+                if (novoVolume != ponto.getVolumeAtual()) {
+                    ponto.setVolumeAtual(novoVolume);
+                    houveAlteracao = true;
+                }
             }
         }
         
         if (houveAlteracao) {
             repository.saveAll(pontos);
-            System.out.println("✅ [EcoCiclo] Os pontos de recolha foram esvaziados com sucesso!");
+            System.out.println("✅ [EcoCiclo] A recolha gradual foi atualizada nos pontos!");
         } else {
-            System.out.println("ℹ️ [EcoCiclo] Nenhum volume para recolher neste momento.");
+            System.out.println("ℹ️ [EcoCiclo] Nenhum volume significativo para recolher neste momento.");
         }
     }
 }
