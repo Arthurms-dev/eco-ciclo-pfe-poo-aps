@@ -13,39 +13,41 @@ import AuthGuard from "./components/AuthGuard";
 import "./globals.css";
 
 export default function RootLayout({ children }) {
-  const pathname = usePathname();
-  const usuario = useAuthStore((state) => state.user);
-  const [montado, setMontado] = useState(false);
+  const pathname = usePathname();
+  const usuario = useAuthStore((state) => state.user);
+  const [montado, setMontado] = useState(false);
 
-  useEffect(() => {
-    setMontado(true);
-  }, []);
-  const isAuthPage = rotasDeAutenticacao.includes(pathname);
-  const rotasDeAutenticacao = ['/login', '/register'];
-  const rotasPublicas = ['/', '/termos', '/privacidade'];
-  const ehRotaPublicaSimples = rotasPublicas.includes(pathname);
-  const mostraBarrasDoSistema = montado && !isAuthPage;
-  const mostraFooter = montado && !isAuthPage;
+  useEffect(() => {
+    setMontado(true);
+  }, []);
 
-return (
-    <html lang="pt-BR">
-      <body className={`min-h-screen flex flex-col bg-[#f5f0e8] ...`}>
-        <Providers>
-          {isAuthPage ? (
-            <main>{children}</main>
-          ) : (
-            <AuthGuard>
-               <Toaster position="top-right" richColors />
-               {mostraBarrasDoSistema && <Navbar />}
-               <div className="flex flex-1">
-                 {mostraBarrasDoSistema && <Sidebar />}
-                 <main className="flex-1 w-full">{children}</main>
-               </div>
-               {mostraFooter && <Footer />}
-            </AuthGuard>
-          )}
-        </Providers>
-      </body>
-    </html>
-  );
+  const rotasDeAutenticacao = ['/login', '/register'];
+  const rotasPublicas = ['/', '/termos', '/privacidade'];
+  const ehRotaPublicaSimples = rotasPublicas.includes(pathname);
+  const mostraBarrasDoSistema = montado && !rotasDeAutenticacao.includes(pathname) && (!ehRotaPublicaSimples || !!usuario);
+  const mostraFooter = montado && !rotasDeAutenticacao.includes(pathname);
+
+  return (
+    <html lang="pt-BR">
+      <body className={`min-h-screen flex flex-col bg-[#f5f0e8] antialiased text-[#1a2421] ${!montado ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
+        <Providers>
+          <AuthGuard>
+            <Toaster position="top-right" richColors />
+
+            {mostraBarrasDoSistema && <Navbar />}
+
+            <div className="flex flex-1">
+              {mostraBarrasDoSistema && <Sidebar />}
+
+              <main className="flex-1 w-full">
+                {children}
+              </main>
+            </div>
+
+            {mostraFooter && <Footer />}
+          </AuthGuard>
+        </Providers>
+      </body>
+    </html>
+  );
 }
