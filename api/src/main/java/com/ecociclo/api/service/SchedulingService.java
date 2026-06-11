@@ -63,6 +63,9 @@ public class SchedulingService {
         scheduling.setEnderecoColeta(dto.getEnderecoColeta());
         scheduling.setStatusEnum(StatusEnum.PENDENTE);
         scheduling.setUser(user);
+        
+        // 👇 SALVAMOS A QUANTIDADE AQUI PARA PODER REVERTER NO FUTURO
+        scheduling.setQuantidade(dto.getQuantidade());
 
         if (dto.getWasteId() != null) {
             wasteItemRepository.findById(dto.getWasteId()).ifPresent(scheduling::setWasteItem);
@@ -75,11 +78,41 @@ public class SchedulingService {
         return schedulingRepository.findAll();
     }
 
+    @Transactional
     public void delete(Long id) {
-        if (schedulingRepository.existsById(id)) {
-            schedulingRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Agendamento não encontrado com o ID: " + id);
+        Scheduling agendamento = schedulingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Agendamento não encontrado com o ID: " + id));
+        if (agendamento.getDataHora() != null && agendamento.getDataHora().isAfter(LocalDateTime.now())) {
+            User user = agendamento.getUser();
+
+            if (user != null) {
+                int quantidade = (agendamento.getQuantidade() != null) ? agendamento.getQuantidade() : 1;
+                int pontosGanhos = quantidade * 50;
+                
+                if (agendamento.getWasteItem() != null && agendamento.getWasteItem().getId() == 1L) {
+                    pontosGanhos *= 2;
+                }
+
+                int saldoAtual = user.getTotalPontos() != null ? user.getTotalPontos() : 0;
+                long totalAgendamentos = schedulingRepository.findAll().stream()
+                        .filter(s -> s.getUser() != null && s.getUser().getId().equals(user.getId()))
+                        .count();
+
+                if (saldoAtual < pontosGanhos) {
+                    if (totalAgendamentos > 1) {
+                        user.setTotalPontos(0);
+                    }
+                } else {
+                    user.setTotalPontos(saldoAtual - pontosGanhos);
+                }
+
+                double totalKg = user.getTotalResiduosKg() != null ? user.getTotalResiduosKg() : 0.0;
+                user.setTotalResiduosKg(Math.max(0.0, totalKg - quantidade));
+
+                userRepository.save(user);
+            }
         }
+
+        schedulingRepository.delete(agendamento);
     }
 }

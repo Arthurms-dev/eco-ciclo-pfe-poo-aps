@@ -11,16 +11,15 @@ export default function AuthGuard({ children }) {
 
   const [isHydrated, setIsHydrated] = useState(false);
 
-
   useEffect(() => {
     setIsHydrated(true);
   }, []);
-
-  const rotasPublicas = ['/', '/login', '/register'];
+  const rotasPublicas = ['/', '/login', '/register', '/termos', '/privacidade'];
   const ehRotaPublica = rotasPublicas.includes(pathname);
 
   useEffect(() => {
     if (!isHydrated) return;
+    
     if (!usuario && !ehRotaPublica) {
       router.replace('/login');
     }

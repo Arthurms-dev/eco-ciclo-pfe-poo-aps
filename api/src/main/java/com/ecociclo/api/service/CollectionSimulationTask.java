@@ -16,9 +16,30 @@ public class CollectionSimulationTask {
 
     @Scheduled(fixedRate = 60000)
     public void simularCaminhaoDeColeta() {
-        System.out.println("🚛 [EcoCiclo] O camião de recolha está a passar... Limpeza gradual!");
-
         List<CollectionPoint> pontos = repository.findAll();
+        if (pontos.isEmpty()) {
+            return;
+        }
+        boolean todosVazios = true;
+        for (CollectionPoint ponto : pontos) {
+            if (ponto.getVolumeAtual() != null && ponto.getVolumeAtual() > 0) {
+                todosVazios = false;
+                break; 
+            }
+        }
+        if (todosVazios) {
+            System.out.println("🔄 [EcoCiclo] Todos os pontos estão vazios! A reiniciar a simulação...");
+            
+            for (CollectionPoint ponto : pontos) {
+                ponto.setVolumeAtual(100.0); 
+            }
+            
+            repository.saveAll(pontos);
+            System.out.println("♻️ [EcoCiclo] Pontos recarregados. O ciclo de limpeza recomeça no próximo minuto!");
+            
+            return; 
+        }
+        System.out.println("🚛 [EcoCiclo] O camião de recolha está a passar... Limpeza gradual!");
         boolean houveAlteracao = false;
         
         for (CollectionPoint ponto : pontos) {
