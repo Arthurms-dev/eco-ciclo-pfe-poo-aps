@@ -16,10 +16,10 @@ export default function Footer() {
         </div>
 
         <div className="flex gap-6 text-xs text-[#1a2421]/60">
-          <Link href="/termos" className="hover:text-[#7d9b76] hover:underline transition-colors">
+          <Link href="/Termos" className="hover:text-[#7d9b76] hover:underline transition-colors">
             Termos de Uso
           </Link>
-          <Link href="/privacidade" className="hover:text-[#7d9b76] hover:underline transition-colors">
+          <Link href="/Privacidade" className="hover:text-[#7d9b76] hover:underline transition-colors">
             Privacidade
           </Link>
           <a 
