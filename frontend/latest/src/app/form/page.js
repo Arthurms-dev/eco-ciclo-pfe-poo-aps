@@ -18,8 +18,6 @@ export default function FormAgendamento({ onAgendamentoSucesso }) {
   const usuarioLogado = useAuthStore((state) => state.user);
   
   const atualizarSessaoLocal = useAuthStore((state) => state.setUser || state.login);
-
-  // Substituímos o localhost pela variável API_URL usando crases (template literals)
   const { data: pontos = [], error: erroPontos, isLoading: carregandoPontos, mutate: mutatePontos } = useSWR(
     `${API_URL}/api/collection-points`, 
     fetcher,
@@ -52,13 +50,25 @@ export default function FormAgendamento({ onAgendamentoSucesso }) {
 
   const horariosFiltrados = horariosDisponiveis.filter(hora => {
     if (!data || !pontoColetaId) return true;
-    const dataHoraSlot = `${data}T${hora}:00`;
-    return !todosAgendamentos.some(ag => 
-      ag.dataHora === dataHoraSlot && 
-      (String(ag.pontoColetaId) === String(pontoColetaId) || ag.enderecoColeta === pontoSelecionado?.endereco)
-    );
-  });
 
+    const dataHoraSlot = `${data}T${hora}:00`;
+    const dataHoraSlotObj = new Date(dataHoraSlot);
+    const agora = new Date();
+
+    if (dataHoraSlotObj < agora) {
+      return false; 
+    }
+    const estaOcupado = todosAgendamentos.some(ag => {
+      if (!ag.dataHora) return false;
+      const dataAgendadaDb = new Date(ag.dataHora).getTime();
+      const dataDoSelect = dataHoraSlotObj.getTime();
+      const mesmoHorario = dataAgendadaDb === dataDoSelect;
+      const mesmoPonto = ag.enderecoColeta === pontoSelecionado?.endereco;
+
+      return mesmoHorario && mesmoPonto;
+    });
+    return !estaOcupado;
+  });
   const handleResetarFormulario = () => {
     setPontoColetaId('');
     setWasteId('');
@@ -128,7 +138,6 @@ export default function FormAgendamento({ onAgendamentoSucesso }) {
           atualizarSessaoLocal(usuarioAtualizado); 
         }
         
-        // Atualizando o cache do SWR com as URLs corretas da nuvem
         globalMutate(`${API_URL}/api/agendamentos`);
         globalMutate(`${API_URL}/api/collection-points`); 
         mutatePontos();
