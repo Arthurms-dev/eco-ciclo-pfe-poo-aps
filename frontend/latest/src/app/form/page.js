@@ -58,6 +58,7 @@ export default function FormAgendamento({ onAgendamentoSucesso }) {
     if (dataHoraSlotObj < agora) {
       return false; 
     }
+    
     const estaOcupado = todosAgendamentos.some(ag => {
       if (!ag.dataHora) return false;
       const dataAgendadaDb = new Date(ag.dataHora).getTime();
@@ -67,8 +68,10 @@ export default function FormAgendamento({ onAgendamentoSucesso }) {
 
       return mesmoHorario && mesmoPonto;
     });
+    
     return !estaOcupado;
   });
+
   const handleResetarFormulario = () => {
     setPontoColetaId('');
     setWasteId('');
@@ -145,7 +148,8 @@ export default function FormAgendamento({ onAgendamentoSucesso }) {
         setSucesso(true);
         if (onAgendamentoSucesso) onAgendamentoSucesso();
       } else {
-        dispararErro('Erro no servidor ao tentar registrar.', 'servidor');
+        const erroDoJava = await response.text();
+        dispararErro(`O servidor recusou: ${erroDoJava}`, 'servidor');
       }
     } catch (err) {
       dispararErro('Falha na comunicação com o servidor.', 'servidor');

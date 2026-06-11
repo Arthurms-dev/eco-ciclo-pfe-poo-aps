@@ -27,12 +27,14 @@ public class SchedulingController {
     private SchedulingService schedulingService;
 
     @PostMapping
-    public ResponseEntity<Scheduling> create(@RequestBody SchedulingDto dto) {
+    public ResponseEntity<?> create(@RequestBody SchedulingDto dto) {
         try {
             Scheduling newScheduling = schedulingService.createScheduling(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(newScheduling);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Falha interna: " + e.getMessage());
         }
     }
 
@@ -41,6 +43,7 @@ public class SchedulingController {
         List<Scheduling> history = schedulingService.getAllSchedulings();
         return ResponseEntity.ok(history);
     }
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteScheduling(@PathVariable Long id) {
         try {
