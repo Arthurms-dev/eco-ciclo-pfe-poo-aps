@@ -48,7 +48,11 @@ public class SchedulingService {
         CollectionPoint ponto = collectionPointRepository.findById(dto.getPontoColetaId())
                 .orElseThrow(() -> new RuntimeException("Ponto de coleta não encontrado"));
 
-        ponto.setVolumeAtual((ponto.getVolumeAtual() == null ? 0.0 : ponto.getVolumeAtual()) + dto.getQuantidade().doubleValue());
+        double volumeAtual = ponto.getVolumeAtual() == null ? 0.0 : ponto.getVolumeAtual();
+        double novoVolume = volumeAtual + dto.getQuantidade().doubleValue();
+        novoVolume = Math.round(novoVolume * 10.0) / 10.0;
+        ponto.setVolumeAtual(novoVolume);
+        
         collectionPointRepository.save(ponto);
 
         int pontosBase = dto.getQuantidade() * 50;
@@ -117,10 +121,13 @@ public class SchedulingService {
             
             if (agendamento.getPontoColetaId() != null) {
                 collectionPointRepository.findById(agendamento.getPontoColetaId()).ifPresent(ponto -> {
-                    double volumeAtual = ponto.getVolumeAtual() != null ? ponto.getVolumeAtual() : 0.0;
+                    double volAtual = ponto.getVolumeAtual() != null ? ponto.getVolumeAtual() : 0.0;
                     double quantidadeCancelada = agendamento.getQuantidade() != null ? agendamento.getQuantidade().doubleValue() : 0.0;
                     
-                    ponto.setVolumeAtual(Math.max(0.0, volumeAtual - quantidadeCancelada));
+                    double novoVol = volAtual - quantidadeCancelada;
+                    novoVol = Math.round(novoVol * 10.0) / 10.0;
+                    
+                    ponto.setVolumeAtual(Math.max(0.0, novoVol));
                     collectionPointRepository.save(ponto);
                 });
             }

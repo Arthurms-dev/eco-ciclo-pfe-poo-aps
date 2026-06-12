@@ -17,7 +17,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (collectionPointRepository.count() == 0) {
+        if (collectionPointRepository.count() < 5) {
             System.out.println("🌱 [EcoCiclo] Banco de dados vazio. Criando pontos de coleta padrão em Recife...");
 
             CollectionPoint ponto1 = new CollectionPoint();

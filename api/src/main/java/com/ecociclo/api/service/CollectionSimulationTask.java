@@ -21,56 +21,31 @@ public class CollectionSimulationTask {
             return;
         }
 
-        boolean todosVazios = true;
-        for (CollectionPoint ponto : pontos) {
-            if (ponto.getVolumeAtual() != null && ponto.getVolumeAtual() > 0) {
-                todosVazios = false;
-                break; 
-            }
-        }
-
-        if (todosVazios) {
-            System.out.println("🔄 [EcoCiclo] Todos os pontos estão vazios! A reiniciar a simulação...");
-            
-            for (CollectionPoint ponto : pontos) {
-                if (ponto.getNomeUnidade().contains("Ilha do Leite")) ponto.setVolumeAtual(100.0);
-                else if (ponto.getNomeUnidade().contains("Boa Viagem")) ponto.setVolumeAtual(80.0);
-                else if (ponto.getNomeUnidade().contains("Bairro do Recife")) ponto.setVolumeAtual(100.0);
-                else if (ponto.getNomeUnidade().contains("Casa Forte")) ponto.setVolumeAtual(250.0);
-                else if (ponto.getNomeUnidade().contains("UFPE")) ponto.setVolumeAtual(400.0);
-                else ponto.setVolumeAtual(100.0); 
-            }
-            
-            repository.saveAll(pontos);
-            System.out.println("♻️ [EcoCiclo] Pontos recarregados. O ciclo recomeça!");
-            return; 
-        }
-
-        System.out.println("🚛 [EcoCiclo] O camião de recolha está a passar... Limpeza gradual!");
+        System.out.println("🔄 [EcoCiclo] Atualizando simulação dos Ecopontos...");
         boolean houveAlteracao = false;
-        
+
         for (CollectionPoint ponto : pontos) {
-            if (ponto.getVolumeAtual() != null && ponto.getVolumeAtual() > 0) {
-                
-                double novoVolume = ponto.getVolumeAtual() - (ponto.getVolumeAtual() * 0.20);
-                
-                if (novoVolume < 1.0) {
-                    novoVolume = 0.0;
-                }
+            double capacidade = ponto.getCapacidadeMax() != null ? ponto.getCapacidadeMax() : 500.0;
+            double volumeAtual = ponto.getVolumeAtual() != null ? ponto.getVolumeAtual() : 0.0;
+
+            if (volumeAtual > (capacidade * 0.8)) {
+                System.out.println("🚛 [EcoCiclo] Caminhão esvaziou o ponto: " + ponto.getNomeUnidade());
+                ponto.setVolumeAtual(0.0);
+                houveAlteracao = true;
+            } else {
+                double lixoAdicional = 2.0 + (Math.random() * 13.0);
+                double novoVolume = volumeAtual + lixoAdicional;
+
                 novoVolume = Math.round(novoVolume * 10.0) / 10.0;
-                
-                if (novoVolume != ponto.getVolumeAtual()) {
-                    ponto.setVolumeAtual(novoVolume);
-                    houveAlteracao = true;
-                }
+
+                ponto.setVolumeAtual(Math.min(novoVolume, capacidade));
+                houveAlteracao = true;
             }
         }
-        
+
         if (houveAlteracao) {
             repository.saveAll(pontos);
-            System.out.println("✅ [EcoCiclo] A recolha gradual foi atualizada nos pontos!");
-        } else {
-            System.out.println("ℹ️ [EcoCiclo] Nenhum volume significativo para recolher neste momento.");
+            System.out.println("♻️ [EcoCiclo] A vida na cidade aconteceu! Volumes atualizados.");
         }
     }
 }

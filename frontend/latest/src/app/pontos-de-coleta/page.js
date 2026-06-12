@@ -126,7 +126,7 @@ export default function PontosDeColetaPage() {
                   )}
                   
                   <div className="flex flex-wrap gap-1 pt-1.5 border-t border-slate-100">
-                    {ponto.tiposResiduosAceitos.split(',').map((t, i) => (
+                    {(ponto.tiposResiduosAceitos || '').split(',').filter(Boolean).map((t, i) => (
                       <span key={i} className="text-[8px] bg-slate-100 text-[#7fa17e] px-1.5 py-0.5 rounded font-black uppercase tracking-wide">
                         {t.trim()}
                       </span>
