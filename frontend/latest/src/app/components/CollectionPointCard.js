@@ -10,7 +10,7 @@ const CollectionPointCard = ({ point, onSelect }) => {
     return 'bg-[#7fa17e]';
   };
 
-  const residuosTags = point.tiposResiduosAceitos.split(',').map(tag => tag.trim());
+  const residuosTags = (point.tiposResiduosAceitos || '').split(',').filter(Boolean).map(tag => tag.trim());
 
   return (
     <div 
