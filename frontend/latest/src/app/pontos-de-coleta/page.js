@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import CollectionPointCard from '../components/CollectionPointCard';
 import { usePontoStore } from '../store/usePontoStore';
-import { Search, Leaf, X, Filter, Layers, MapPin } from 'lucide-react';
+import { Search, Leaf, X, Filter, Layers, List } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -35,6 +35,7 @@ export default function PontosDeColetaPage() {
   } = usePontoStore();
   
   const [map, setMap] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const apiUrl = searchTerm
     ? `${API_URL}/api/collection-points/search/by-type?tipoResiduo=${searchTerm}`
@@ -80,6 +81,9 @@ export default function PontosDeColetaPage() {
     if (map) {
       map.flyTo([lat, lng], 15);
       setMapPosition([lat, lng], 15);
+    }
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false);
     }
   };
 
@@ -139,10 +143,20 @@ export default function PontosDeColetaPage() {
         </MapContainer>
       </div>
 
-      <aside className="absolute top-4 left-4 bottom-4 w-full max-w-[420px] z-[1000] flex flex-col pointer-events-none">
-        <div className="bg-white/95 backdrop-blur-sm rounded-[32px] shadow-2xl shadow-slate-900/10 flex flex-col h-full pointer-events-auto overflow-hidden border border-white/50">
+      <button 
+        onClick={() => setIsSidebarOpen(true)}
+        className="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-[500] bg-[#7fa17e] text-white px-6 py-3 rounded-full shadow-xl shadow-[#7fa17e]/40 font-bold tracking-wide flex items-center gap-2 animate-bounce border-2 border-white/20"
+      >
+        <List size={20} />
+        Ver Ecopontos
+      </button>
 
-          <div className="p-8 pb-6">
+      <aside className={`absolute top-0 md:top-4 left-0 md:left-4 bottom-0 md:bottom-4 w-full md:max-w-[420px] z-[1000] flex flex-col transition-transform duration-300 ease-in-out pointer-events-none ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+      }`}>
+        <div className="bg-white/95 backdrop-blur-sm md:rounded-[32px] shadow-2xl shadow-slate-900/10 flex flex-col h-full pointer-events-auto overflow-hidden border border-white/50 w-full h-full">
+
+          <div className="p-6 md:p-8 pb-6">
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
                 <div className="w-10 h-10 bg-[#7fa17e] rounded-[14px] flex items-center justify-center text-white shadow-md shadow-[#7fa17e]/32">
@@ -151,17 +165,26 @@ export default function PontosDeColetaPage() {
                 EcoCiclo
               </h1>
               
-              <button 
-                onClick={toggleMapMode}
-                title="Alternar entre Mapa e Satélite"
-                className={`p-2 rounded-full transition-all duration-300 shadow-sm border ${
-                  mapMode === 'satellite' 
-                    ? 'bg-[#7fa17e] text-white border-[#7fa17e]' 
-                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200 border-transparent'
-                }`}
-              >
-                <Layers size={18} />
-              </button>
+              <div className="flex gap-2">
+                <button 
+                  onClick={toggleMapMode}
+                  title="Alternar entre Mapa e Satélite"
+                  className={`p-2 rounded-full transition-all duration-300 shadow-sm border ${
+                    mapMode === 'satellite' 
+                      ? 'bg-[#7fa17e] text-white border-[#7fa17e]' 
+                      : 'bg-slate-100 text-slate-500 hover:bg-slate-200 border-transparent'
+                  }`}
+                >
+                  <Layers size={18} />
+                </button>
+
+                <button 
+                  onClick={() => setIsSidebarOpen(false)}
+                  className="md:hidden p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-rose-100 hover:text-rose-500 transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
             
             <div className="relative group">
