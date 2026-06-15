@@ -17,6 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecociclo.api.dto.UserResponseDTO;
 import com.ecociclo.api.model.User;
 import com.ecociclo.api.service.UserService;
+import com.ecociclo.api.repository.CollectionPointRepository;
+import com.ecociclo.api.repository.SchedulingRepository;
+import com.ecociclo.api.repository.UserRepository;
+import com.ecociclo.api.repository.WasteItemRepository;
 
 import jakarta.validation.Valid;
 
@@ -27,6 +31,11 @@ public class UserController {
 
     @Autowired
     private UserService service;
+
+    @Autowired private SchedulingRepository schedulingRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private CollectionPointRepository collectionPointRepository;
+    @Autowired private WasteItemRepository wasteItemRepository;
 
     @PostMapping
     public ResponseEntity<UserResponseDTO> criar(@Valid @RequestBody User user) {
@@ -49,10 +58,12 @@ public class UserController {
     public ResponseEntity<List<UserResponseDTO>> obterRanking() {
         return ResponseEntity.ok(service.listarTop3Ranking());
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(new UserResponseDTO(service.buscarPorId(id)));
     }
+
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> listarTodos() {
         return ResponseEntity.ok(service.listarTodos());
@@ -67,5 +78,15 @@ public class UserController {
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         service.deletar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/admin/reset-database")
+    public ResponseEntity<String> resetarTudo() {
+        schedulingRepository.deleteAll();
+        userRepository.deleteAll();
+        collectionPointRepository.deleteAll();
+        wasteItemRepository.deleteAll();
+        
+        return ResponseEntity.ok("Banco de dados resetado com sucesso!");
     }
 }
