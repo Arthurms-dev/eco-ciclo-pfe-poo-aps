@@ -81,9 +81,9 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 h-[calc(100vh-4rem)] bg-[#f5f0e8] border-r border-[#a8c0a0]/20 flex flex-col justify-between p-4 font-sans sticky top-16 overflow-y-auto custom-scrollbar">
+    <aside className="w-full md:w-64 h-auto md:h-[calc(100vh-4rem)] bg-[#f5f0e8] border-b md:border-b-0 md:border-r border-[#a8c0a0]/20 flex flex-col justify-between p-4 font-sans md:sticky md:top-16 md:overflow-y-auto custom-scrollbar z-10 shadow-sm md:shadow-none">
       
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         
         {usuario && (
           <div className="bg-[#dce5d4]/40 border border-[#a8c0a0]/30 rounded-xl p-3.5 flex items-center justify-between shadow-sm">
@@ -100,7 +100,7 @@ export default function Sidebar() {
           </div>
         )}
 
-        <nav className="space-y-1">
+        <nav className="grid grid-cols-2 gap-2 md:flex md:flex-col md:gap-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -109,7 +109,7 @@ export default function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
+                className={`flex items-center gap-2 md:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
                   isActive
                     ? "bg-[#7d9b76] text-[#f5f0e8] shadow-sm"
                     : "text-[#1a2421]/70 hover:bg-[#dce5d4]/50 hover:text-[#7d9b76]"
@@ -117,8 +117,8 @@ export default function Sidebar() {
               >
                 <Icon className={`h-5 w-5 shrink-0 ${isActive ? "text-[#f5f0e8]" : "text-[#7d9b76] group-hover:scale-105 transition-transform"}`} />
                 <div className="flex flex-col min-w-0">
-                  <span className="truncate leading-normal">{item.title}</span>
-                  <span className={`text-[10px] font-normal truncate leading-none mt-0.5 ${isActive ? "text-[#f5f0e8]/70" : "text-[#1a2421]/40"}`}>
+                  <span className="truncate leading-normal text-xs md:text-sm">{item.title}</span>
+                  <span className={`hidden md:block text-[10px] font-normal truncate leading-none mt-0.5 ${isActive ? "text-[#f5f0e8]/70" : "text-[#1a2421]/40"}`}>
                     {item.description}
                   </span>
                 </div>
@@ -127,7 +127,7 @@ export default function Sidebar() {
           })}
         </nav>
 
-        <div className="pt-4 mt-4 border-t border-[#a8c0a0]/20">
+        <div className="hidden md:block pt-4 mt-4 border-t border-[#a8c0a0]/20">
           <h3 className="text-[11px] font-black uppercase tracking-wider text-[#1a2421]/40 mb-3 flex items-center gap-2 px-2">
             <Trophy className="h-3.5 w-3.5 text-amber-500" /> Top 3 Recicladores
           </h3>
@@ -162,6 +162,18 @@ export default function Sidebar() {
         </div>
 
       </div>
+
+      <div className="mt-6 md:mt-4 pt-4 border-t border-[#a8c0a0]/20">
+        <button
+          onClick={handleLogout}
+          className="flex items-center justify-center md:justify-start gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
+        >
+          <LogOut className="h-5 w-5" />
+          <span className="hidden md:inline">Sair da Conta</span>
+          <span className="inline md:hidden text-xs">Sair</span>
+        </button>
+      </div>
+
     </aside>
   );
 }

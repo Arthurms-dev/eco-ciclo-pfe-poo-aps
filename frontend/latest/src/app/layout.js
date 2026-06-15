@@ -13,41 +13,43 @@ import AuthGuard from "./components/AuthGuard";
 import "./globals.css";
 
 export default function RootLayout({ children }) {
-  const pathname = usePathname();
-  const usuario = useAuthStore((state) => state.user);
-  const [montado, setMontado] = useState(false);
+  const pathname = usePathname();
+  const usuario = useAuthStore((state) => state.user);
+  const [montado, setMontado] = useState(false);
 
-  useEffect(() => {
-    setMontado(true);
-  }, []);
+  useEffect(() => {
+    setMontado(true);
+  }, []);
 
-  const rotasDeAutenticacao = ['/login', '/register'];
-  const rotasPublicas = ['/', '/Termos', '/Privacidade'];
-  const ehRotaPublicaSimples = rotasPublicas.includes(pathname);
-  const mostraBarrasDoSistema = montado && !rotasDeAutenticacao.includes(pathname) && (!ehRotaPublicaSimples || !!usuario);
-  const mostraFooter = montado && !rotasDeAutenticacao.includes(pathname);
+  const rotasDeAutenticacao = ['/login', '/register'];
+  const rotasPublicas = ['/', '/Termos', '/Privacidade'];
+  const ehRotaPublicaSimples = rotasPublicas.includes(pathname);
+  const mostraBarrasDoSistema = montado && !rotasDeAutenticacao.includes(pathname) && (!ehRotaPublicaSimples || !!usuario);
+  const mostraFooter = montado && !rotasDeAutenticacao.includes(pathname);
 
-  return (
-    <html lang="pt-BR">
-      <body className={`min-h-screen flex flex-col bg-[#f5f0e8] antialiased text-[#1a2421] ${!montado ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
-        <Providers>
-          <AuthGuard>
-            <Toaster position="top-right" richColors />
+  return (
+    <html lang="pt-BR">
+      <body className={`min-h-screen flex flex-col bg-[#f5f0e8] antialiased text-[#1a2421] overflow-x-hidden ${!montado ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
+        <Providers>
+          <AuthGuard>
+            <Toaster position="top-right" richColors />
 
-            {mostraBarrasDoSistema && <Navbar />}
+            {mostraBarrasDoSistema && <Navbar />}
 
-            <div className="flex flex-1">
-              {mostraBarrasDoSistema && <Sidebar />}
+            <div className="flex flex-col md:flex-row flex-1 w-full max-w-[100vw] overflow-hidden">
+              
+              {mostraBarrasDoSistema && <Sidebar />}
 
-              <main className="flex-1 w-full">
-                {children}
-              </main>
-            </div>
+              <main className="flex-1 w-full max-w-[100vw] overflow-y-auto">
+                {children}
+              </main>
 
-            {mostraFooter && <Footer />}
-          </AuthGuard>
-        </Providers>
-      </body>
-    </html>
-  );
+            </div>
+
+            {mostraFooter && <Footer />}
+          </AuthGuard>
+        </Providers>
+      </body>
+    </html>
+  );
 }
