@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "./store/useAuthStore";
 import { Leaf, Recycle, Calendar, Award, Flame, ArrowRight, Star, Store, MapPin, Box, CheckCircle } from "lucide-react";
 
 export default function HomePage() {
@@ -166,7 +166,7 @@ export default function HomePage() {
           </div>
           
           <div className="mt-10">
-            <Link href="/parceiro" className="text-sm font-bold text-[#7d9b76] hover:text-[#5a7654] transition-colors underline underline-offset-4">
+            <Link href="/parceiro/login" className="text-sm font-bold text-[#7d9b76] hover:text-[#5a7654] transition-colors underline underline-offset-4">
               Aceder ao Portal Operacional do Parceiro &rarr;
             </Link>
           </div>

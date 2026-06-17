@@ -2,13 +2,15 @@
 import { useState } from 'react';
 import { Store, CheckCircle, Clock, MapPin, Box, ArrowRightCircle, Search } from 'lucide-react';
 import useSWR from 'swr';
-import api from '../../services/api';
+import api from '../services/api';
 import { toast } from 'sonner';
 
 const fetcher = (url) => api.get(url).then(res => res.data);
 
 export default function PortalParceiroPage() {
-  const { data: agendamentosPendentes = [], mutate, isLoading } = useSWR(`/agendamentos/pendentes`, fetcher, { refreshInterval: 5000 });
+  const { data: agendamentosPendentes = [], mutate, isLoading } = useSWR(`/agendamentos/pendentes`, fetcher, { 
+    refreshInterval: 5000 
+  });
   
   const [carregandoAcao, setCarregandoAcao] = useState(null);
   const [busca, setBusca] = useState('');
@@ -38,7 +40,9 @@ export default function PortalParceiroPage() {
     }
   };
 
-  const pendentesFiltrados = agendamentosPendentes.filter(ag => {
+  const dadosSeguros = Array.isArray(agendamentosPendentes) ? agendamentosPendentes : [];
+
+  const pendentesFiltrados = dadosSeguros.filter(ag => {
     const nome = ag.user?.nome || ag.userId || "Cidadão Eco";
     return String(nome).toLowerCase().includes(busca.toLowerCase());
   });
@@ -71,7 +75,7 @@ export default function PortalParceiroPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white/5 border border-white/10 p-6 rounded-3xl">
             <p className="text-white/40 text-xs font-black uppercase tracking-widest mb-2">Aguardando Recebimento</p>
-            <h3 className="text-4xl font-black text-amber-400">{agendamentosPendentes.length}</h3>
+            <h3 className="text-4xl font-black text-amber-400">{dadosSeguros.length}</h3>
           </div>
           <div className="md:col-span-2 bg-white/5 border border-white/10 p-6 rounded-3xl flex flex-col justify-center">
             <label className="text-white/40 text-xs font-black uppercase tracking-widest mb-3 block">Pesquisar Cidadão na Fila</label>
@@ -101,7 +105,7 @@ export default function PortalParceiroPage() {
             ) : pendentesFiltrados.length === 0 ? (
               <div className="text-center py-16 bg-white/5 rounded-2xl border border-dashed border-white/10">
                 <CheckCircle className="h-10 w-10 mx-auto text-white/20 mb-3" />
-                <p className="text-white/50 font-medium">Nenhum agendamento encontrado para hoje.</p>
+                <p className="text-white/50 font-medium">Nenhum agendamento encontrado.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4">

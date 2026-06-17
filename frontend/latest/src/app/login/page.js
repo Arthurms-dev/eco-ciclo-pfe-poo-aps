@@ -1,10 +1,10 @@
 'use client';
-import { Eye, EyeOff, Leaf, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Leaf, ArrowRight, Store } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '../../store/useAuthStore';
+import { useAuthStore } from '../store/useAuthStore';
 import Link from 'next/link';
-import api from '../../services/api'; 
+import api from '../services/api'; 
 
 export default function LoginPage() {
   const router = useRouter();
