@@ -40,7 +40,8 @@ public class User {
     
     @Column(name = "total_residuos_kg")
     private Double totalResiduosKg = 0.0;
-
+    @Column(name = "pontos_pendentes")
+    private Integer pontosPendentes = 0;
     @Column(name = "total_pontos")
     private Integer totalPontos = 0;
     private java.time.LocalDate ultimaAtividade;

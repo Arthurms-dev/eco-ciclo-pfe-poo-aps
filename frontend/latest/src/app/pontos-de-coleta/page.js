@@ -6,18 +6,14 @@ import CollectionPointCard from '../components/CollectionPointCard';
 import { usePontoStore } from '../store/usePontoStore';
 import { Search, Leaf, X, Filter, Layers, List } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
+import api from '../../services/api';
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
-const API_URL = 'https://eco-ciclo-pfe-poo-aps-backend.onrender.com';
-
-const fetcher = (url) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error('Erro ao buscar dados da API');
-  return res.json();
-});
+const fetcher = (url) => api.get(url).then(res => res.data);
 
 export default function PontosDeColetaPage() {
   
@@ -38,8 +34,8 @@ export default function PontosDeColetaPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const apiUrl = searchTerm
-    ? `${API_URL}/api/collection-points/search/by-type?tipoResiduo=${searchTerm}`
-    : `${API_URL}/api/collection-points`;
+    ? `/collection-points/search/by-type?tipoResiduo=${searchTerm}`
+    : `/collection-points`;
 
   const { data: pontos = [], error, isLoading } = useSWR(apiUrl, fetcher, {
     revalidateOnFocus: true,
@@ -98,7 +94,7 @@ export default function PontosDeColetaPage() {
   return (
     <div className="relative w-full h-screen bg-white font-sans overflow-hidden">
     
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 bg-[#eef4ec] transition-colors duration-500">
         <MapContainer 
           center={mapCenter}
           zoom={mapZoom}

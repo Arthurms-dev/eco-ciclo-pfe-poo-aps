@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional; 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ecociclo.api.dto.UserResponseDTO;
@@ -16,10 +18,15 @@ public class UserService {
     @Autowired
     private UserRepository repository;
 
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     public UserResponseDTO cadastrar(User user) {
         if(repository.findByEmail(user.getEmail()).isPresent()) {
             throw new RuntimeException("E-mail já cadastrado.");
         }
+
+        // Encriptar a senha antes de salvar!
+        user.setSenha(passwordEncoder.encode(user.getSenha()));
 
         if (user.getStreak() == null) user.setStreak(0);
         if (user.getTotalPontos() == null) user.setTotalPontos(0);
@@ -34,14 +41,11 @@ public class UserService {
     }
 
     public List<UserResponseDTO> listarTodos() {
-        return repository.findAll().stream()
-                .map(UserResponseDTO::new)
-                .toList();
+        return repository.findAll().stream().map(UserResponseDTO::new).toList();
     }
 
     public User buscarPorId(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        return repository.findById(id).orElseThrow(() -> new RuntimeException("Utilizador não encontrado"));
     }
 
     public UserResponseDTO atualizar(Long id, User userAtualizado) {
@@ -64,9 +68,7 @@ public class UserService {
     }
 
     public void incrementarStreak(Long userId) {
-        User user = repository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        
+        User user = buscarPorId(userId);
         java.time.LocalDate hoje = java.time.LocalDate.now();
         
         if (user.getUltimaAtividade() == null || user.getUltimaAtividade().plusDays(1).equals(hoje)) {
@@ -78,9 +80,8 @@ public class UserService {
         user.setUltimaAtividade(hoje);
         repository.save(user);
     }
+
     public List<UserResponseDTO> listarTop3Ranking() {
-        return repository.findTop3ByOrderByStreakDesc().stream()
-                .map(UserResponseDTO::new)
-                .toList();
+        return repository.findTop3ByOrderByStreakDesc().stream().map(UserResponseDTO::new).toList();
     }
 }

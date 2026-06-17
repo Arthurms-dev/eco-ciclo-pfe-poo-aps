@@ -23,9 +23,13 @@ export default function RootLayout({ children }) {
 
   const rotasDeAutenticacao = ['/login', '/register'];
   const rotasPublicas = ['/', '/Termos', '/Privacidade'];
+  
+  const ehRotaDeParceiro = pathname.startsWith('/parceiro');
   const ehRotaPublicaSimples = rotasPublicas.includes(pathname);
-  const mostraBarrasDoSistema = montado && !rotasDeAutenticacao.includes(pathname) && (!ehRotaPublicaSimples || !!usuario);
-  const mostraFooter = montado && !rotasDeAutenticacao.includes(pathname);
+  
+  const mostraBarrasDoSistema = montado && !rotasDeAutenticacao.includes(pathname) && (!ehRotaPublicaSimples || !!usuario) && !ehRotaDeParceiro;
+  
+  const mostraFooter = montado && !rotasDeAutenticacao.includes(pathname) && !ehRotaDeParceiro;
 
   return (
     <html lang="pt-BR">
@@ -40,7 +44,7 @@ export default function RootLayout({ children }) {
               
               {mostraBarrasDoSistema && <Sidebar />}
 
-              <main className="flex-1 w-full max-w-[100vw] overflow-y-auto">
+              <main className={`flex-1 w-full max-w-[100vw] overflow-y-auto ${ehRotaDeParceiro ? 'bg-[#1a2421]' : ''}`}>
                 {children}
               </main>
 

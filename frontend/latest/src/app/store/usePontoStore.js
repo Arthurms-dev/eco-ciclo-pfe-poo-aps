@@ -4,7 +4,7 @@ export const usePontoStore = create((set) => ({
   searchTerm: '',
   pontoSelecionadoId: null,
   mapMode: 'default',
-  mapCenter: [-8.0539, -34.8811],
+  mapCenter: [-8.0617, -34.8710], 
   mapZoom: 13,
   
   setSearchTerm: (term) => set({ searchTerm: term }),

@@ -1,9 +1,11 @@
 package com.ecociclo.api.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.ecociclo.api.dto.LoginResponseDTO;
 import com.ecociclo.api.dto.UserResponseDTO;
 import com.ecociclo.api.model.User;
 import com.ecociclo.api.service.UserService;
@@ -46,12 +51,22 @@ public class UserController {
     public ResponseEntity<?> logar(@RequestBody User dadosLogin) {
         return service.buscarPorEmail(dadosLogin.getEmail())
             .map(usuario -> {
-                if (usuario.getSenha().equals(dadosLogin.getSenha())) {
-                    return ResponseEntity.ok(new UserResponseDTO(usuario));
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                
+                if (encoder.matches(dadosLogin.getSenha(), usuario.getSenha())) {
+                    
+                    Algorithm algorithm = Algorithm.HMAC256("chavesecreta-ecociclo-2026");
+                    String token = JWT.create()
+                            .withIssuer("ecociclo-api")
+                            .withSubject(usuario.getEmail())
+                            .withExpiresAt(new Date(System.currentTimeMillis() + 86400000))
+                            .sign(algorithm);
+                    
+                    return ResponseEntity.ok(new LoginResponseDTO(new UserResponseDTO(usuario), token));
                 }
-                return ResponseEntity.status(401).body("Senha incorreta.");
+                return ResponseEntity.status(401).body("{\"mensagem\": \"Senha incorreta.\"}");
             })
-            .orElse(ResponseEntity.status(404).body("Usuário não encontrado."));
+            .orElse(ResponseEntity.status(404).body("{\"mensagem\": \"Usuário não encontrado.\"}"));
     }
 
     @GetMapping("/ranking")

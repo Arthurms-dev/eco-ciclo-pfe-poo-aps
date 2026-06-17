@@ -5,16 +5,13 @@ import { useState } from "react";
 import { Award, Ticket, CheckCircle, Copy, Info, ShoppingBag, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "../../store/useAuthStore";
-
-const API_URL = 'https://eco-ciclo-pfe-poo-aps-backend.onrender.com';
+import api from '../../services/api';
 
 export default function RecompensasPage() {
   const usuarioLogado = useAuthStore((state) => state.user);
   const atualizarSessaoLocal = useAuthStore((state) => state.login || state.setUser);
   
-  
   const saldoPontos = usuarioLogado?.totalPontos || 0;
-
   const [meusCupons, setMeusCupons] = useState([]);
 
   const [recompensas] = useState([
@@ -67,30 +64,22 @@ export default function RecompensasPage() {
     const usuarioAtualizado = { ...usuarioLogado, totalPontos: novoSaldo };
 
     try {
-      const response = await fetch(`${API_URL}/api/usuarios/${usuarioLogado.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(usuarioAtualizado)
-      });
+      const response = await api.put(`/usuarios/${usuarioLogado.id}`, usuarioAtualizado);
 
-      if (response.ok) {
-        if (atualizarSessaoLocal) atualizarSessaoLocal(usuarioAtualizado);
+      if (atualizarSessaoLocal) atualizarSessaoLocal(response.data);
         
-        const codigoGerado = `ECO-${Math.floor(1000 + Math.random() * 9000)}`;
-        const novoCupom = {
-          idResgate: Date.now(),
-          titulo: item.titulo,
-          empresa: item.empresa,
-          codigo: codigoGerado,
-          comoUsar: item.comoUsar,
-          data: new Date().toLocaleDateString('pt-BR')
-        };
+      const codigoGerado = `ECO-${Math.floor(1000 + Math.random() * 9000)}`;
+      const novoCupom = {
+        idResgate: Date.now(),
+        titulo: item.titulo,
+        empresa: item.empresa,
+        codigo: codigoGerado,
+        comoUsar: item.comoUsar,
+        data: new Date().toLocaleDateString('pt-BR')
+      };
 
-        setMeusCupons((prev) => [novoCupom, ...prev]);
-        toast.success(`Cupom "${item.titulo}" resgatado com sucesso! Veja-o abaixo.`);
-      } else {
-        toast.error("Erro no servidor ao tentar abater os pontos.");
-      }
+      setMeusCupons((prev) => [novoCupom, ...prev]);
+      toast.success(`Cupom "${item.titulo}" resgatado com sucesso! Veja-o abaixo.`);
     } catch (err) {
       console.error(err);
       toast.error("Falha na comunicação com o servidor.");
@@ -108,6 +97,7 @@ export default function RecompensasPage() {
     setMeusCupons((prev) => prev.filter(cupom => cupom.idResgate !== idResgate));
     toast.success(`Cupom "${titulo}" aplicado e utilizado com sucesso!`);
   };
+
   if (!usuarioLogado) {
     return (
       <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center">
