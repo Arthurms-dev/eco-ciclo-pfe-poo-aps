@@ -3,7 +3,12 @@ package com.ecociclo.api.controller;
 import java.util.Date;
 import java.util.List;
 
+import java.sql.Connection;
+import java.sql.Statement;
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -33,7 +38,8 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/usuarios")
 @CrossOrigin(origins = "*") 
 public class UserController {
-
+    @Autowired
+    private DataSource dataSource;
     @Autowired
     private UserService service;
 
@@ -95,13 +101,21 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/admin/reset-database")
-    public ResponseEntity<String> resetarTudo() {
-        schedulingRepository.deleteAll();
-        userRepository.deleteAll();
-        collectionPointRepository.deleteAll();
-        wasteItemRepository.deleteAll();
+    @DeleteMapping("/reset-database")
+public ResponseEntity<String> resetDatabase() {
+    
+   
+    try (Connection connection = dataSource.getConnection();
+         Statement statement = connection.createStatement()) {
+
+    
+        String sql = "TRUNCATE TABLE tb_scheduling, tb_waste_item, tb_reward, tb_collection_point, tb_user CASCADE;";
         
-        return ResponseEntity.ok("Banco de dados resetado com sucesso!");
-    }
-}
+        statement.execute(sql);
+
+        return ResponseEntity.ok("Banco de dados limpo com sucesso (TRUNCATE).");
+
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erro ao resetar o banco de dados: " + e.getMessage());
+    } } }
