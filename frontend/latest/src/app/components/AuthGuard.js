@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useAuthStore } from '../../store/useAuthStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function AuthGuard({ children }) {
   const router = useRouter();
@@ -14,7 +14,8 @@ export default function AuthGuard({ children }) {
   useEffect(() => {
     setIsHydrated(true);
   }, []);
-  const rotasPublicas = ['/', '/login', '/register', '/Termos', '/Privacidade'];
+  
+  const rotasPublicas = ['/', '/login', '/register', '/Termos', '/Privacidade', '/parceiro/login'];
   const ehRotaPublica = rotasPublicas.includes(pathname);
 
   useEffect(() => {

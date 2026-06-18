@@ -28,17 +28,21 @@ export default function HomePage() {
           <div className="flex items-center gap-2 font-heading font-black text-xl tracking-tight text-[#7d9b76]">
             <Leaf className="h-6 w-6" /> EcoCiclo
           </div>
-          <button 
-            onClick={() => router.push('/login')}
-            className="px-6 py-2.5 rounded-full text-sm font-bold border-2 border-[#7d9b76] text-[#7d9b76] hover:bg-[#7d9b76] hover:text-[#f5f0e8] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-          >
-            Entrar
-          </button>
+          <div className="flex items-center gap-4">
+            <Link href="/parceiro/login" className="hidden sm:block text-xs font-bold text-[#1a2421]/60 hover:text-[#7d9b76] uppercase tracking-widest transition-colors">
+              Para Empresas
+            </Link>
+            <button 
+              onClick={() => router.push('/login')}
+              className="px-6 py-2.5 rounded-full text-sm font-bold border-2 border-[#7d9b76] text-[#7d9b76] hover:bg-[#7d9b76] hover:text-[#f5f0e8] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+            >
+              Entrar
+            </button>
+          </div>
         </header>
       )}
       
       <section className="relative px-4 md:px-6 py-12 md:py-24 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center z-10">
-        
         <div className="flex flex-col items-center lg:items-start text-center lg:text-left animate-in slide-in-from-left-8 duration-1000">
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm text-[#7d9b76] text-xs font-bold mb-6 border border-[#a8c0a0]/30">
             <Star className="h-3.5 w-3.5 fill-current text-yellow-500" /> A plataforma nº1 em sustentabilidade
@@ -60,15 +64,12 @@ export default function HomePage() {
               Começar Agora <ArrowRight className="h-5 w-5" />
             </Link>
             
-            <button 
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+            <Link 
+              href="#como-funciona"
               className="flex items-center justify-center h-14 px-8 rounded-2xl text-base font-bold bg-white text-[#1a2421] border border-[#a8c0a0]/30 hover:bg-gray-50 transition-colors cursor-pointer"
             >
               Como Funciona?
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -150,22 +151,25 @@ export default function HomePage() {
           <span className="text-[#7d9b76] text-xs font-black uppercase tracking-widest mb-2 block">Rede de Ecopontos</span>
           <h2 className="text-3xl font-black text-[#1a2421] mb-10">Empresas que confiam no EcoCiclo</h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl border border-[#a8c0a0]/20 hover:border-[#7d9b76] transition-colors cursor-pointer shadow-sm">
-              <Store className="h-10 w-10 text-[#1a2421] mb-2" />
-              <span className="font-black text-sm text-[#1a2421]">Supermercados BOM</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl border border-[#a8c0a0]/20 hover:border-[#7d9b76] transition-all cursor-pointer shadow-sm h-32 hover:scale-105">
+              <img src="https://logo.clearbit.com/natura.com.br" alt="Natura" className="h-10 object-contain mb-3" />
+              <span className="font-black text-[10px] text-[#1a2421] tracking-wider uppercase">Natura</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl border border-[#a8c0a0]/20 hover:border-[#7d9b76] transition-colors cursor-pointer shadow-sm">
-              <MapPin className="h-10 w-10 text-[#1a2421] mb-2" />
-              <span className="font-black text-sm text-[#1a2421]">Postos Rota Verde</span>
+            
+            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl border border-[#a8c0a0]/20 hover:border-[#7d9b76] transition-all cursor-pointer shadow-sm h-32 hover:scale-105">
+              <img src="https://logo.clearbit.com/carrefour.com.br" alt="Carrefour" className="h-10 object-contain mb-3" />
+              <span className="font-black text-[10px] text-[#1a2421] tracking-wider uppercase">Carrefour</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl border border-[#a8c0a0]/20 hover:border-[#7d9b76] transition-colors cursor-pointer shadow-sm">
-              <Box className="h-10 w-10 text-[#1a2421] mb-2" />
-              <span className="font-black text-sm text-[#1a2421]">Logística Tech</span>
+            
+            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl border border-[#a8c0a0]/20 hover:border-[#7d9b76] transition-all cursor-pointer shadow-sm h-32 hover:scale-105">
+              <img src="https://logo.clearbit.com/ambev.com.br" alt="Ambev" className="h-10 object-contain mb-3" />
+              <span className="font-black text-[10px] text-[#1a2421] tracking-wider uppercase">Ambev Logística</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl border border-[#a8c0a0]/20 hover:border-[#7d9b76] transition-colors cursor-pointer shadow-sm">
-              <CheckCircle className="h-10 w-10 text-[#1a2421] mb-2" />
-              <span className="font-black text-sm text-[#1a2421]">ONG Vida Limpa</span>
+            
+            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl border border-[#a8c0a0]/20 hover:border-[#7d9b76] transition-all cursor-pointer shadow-sm h-32 hover:scale-105">
+              <img src="https://logo.clearbit.com/br.ifood.com" alt="iFood" className="h-10 object-contain mb-3" />
+              <span className="font-black text-[10px] text-[#1a2421] tracking-wider uppercase">iFood Sustentável</span>
             </div>
           </div>
           

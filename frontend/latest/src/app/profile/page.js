@@ -1,11 +1,11 @@
 'use client';
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { User, Mail, Flame, Recycle, Award, MapPin, CalendarClock, Clock, Trash2, CheckCircle, Phone } from "lucide-react";
+import { User, Mail, Flame, Recycle, Award, MapPin, CalendarClock, Clock, Trash2, Camera, Phone } from "lucide-react";
 import { toast } from "sonner";
-import { useAuthStore } from "../../store/useAuthStore"; 
+import { useAuthStore } from "@/store/useAuthStore"; 
 import useSWR from 'swr';
-import api from '../../services/api';
+import api from '@/services/api';
 
 const fetcher = (url) => api.get(url).then(res => res.data);
 
@@ -17,6 +17,7 @@ export default function PerfilPage() {
   const [nomeForm, setNomeForm] = useState("");
   const [cidadeForm, setCidadeForm] = useState("Recife - PE");
   const [telefoneForm, setTelefoneForm] = useState("");
+  const [fotoPerfil, setFotoPerfil] = useState(null);
 
   const { data: todosAgendamentos = [], mutate } = useSWR(`/agendamentos`, fetcher, { refreshInterval: 3000 });
 
@@ -95,23 +96,33 @@ export default function PerfilPage() {
     } catch (error) { toast.error("Erro ao cancelar."); }
   };
 
-  const handleSimularEntrega = async (idAgendamento) => {
-    try {
-      await api.put(`/agendamentos/${idAgendamento}/concluir`);
-      toast.success("Entrega confirmada pelo Ecoponto! Pontos libertados com sucesso.");
-      const userAtualizado = await api.get(`/usuarios/${usuarioLogado.id}`);
-      atualizarSessaoLocal(userAtualizado.data);
-      mutate();
-    } catch (err) { toast.error("Erro ao confirmar entrega."); }
+  const handleFotoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFotoPerfil(URL.createObjectURL(file));
+      toast.success("Foto de perfil atualizada com sucesso!");
+    }
   };
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-[#f5f0e8] p-6 md:p-10 font-sans text-[#1a2421]">
       
       <div className="max-w-5xl mx-auto mb-8 animate-in fade-in slide-in-from-top-4 duration-700 flex flex-col md:flex-row items-start md:items-center gap-6">
-        <div className="h-24 w-24 rounded-full bg-gradient-to-tr from-[#7d9b76] to-[#a8c0a0] flex items-center justify-center shadow-lg text-white text-3xl font-black border-4 border-white">
-          {getIniciais(usuarioLogado.nome)}
+        
+        <div className="relative group cursor-pointer" onClick={() => document.getElementById('upload-foto').click()}>
+          <div className="h-24 w-24 rounded-full bg-gradient-to-tr from-[#7d9b76] to-[#a8c0a0] flex items-center justify-center shadow-lg text-white text-3xl font-black border-4 border-white overflow-hidden">
+            {fotoPerfil ? (
+              <img src={fotoPerfil} alt="Perfil" className="h-full w-full object-cover" />
+            ) : (
+              getIniciais(usuarioLogado.nome)
+            )}
+          </div>
+          <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+            <Camera className="text-white h-6 w-6" />
+          </div>
+          <input type="file" id="upload-foto" className="hidden" accept="image/*" onChange={handleFotoUpload} />
         </div>
+
         <div>
           <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full mb-2 border ${nivelAtual.cor}`}>
             {nivelAtual.icone} Nível: {nivelAtual.titulo}
@@ -213,14 +224,11 @@ export default function PerfilPage() {
 
                       <div className="flex items-center justify-between w-full sm:w-auto gap-2 sm:flex-col sm:items-end">
                         <span className={`px-3 py-1.5 text-[10px] uppercase tracking-widest font-black rounded-lg ${isConcluido ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                          {isConcluido ? 'Concluído' : 'Aguardando Entrega'}
+                          {isConcluido ? 'Concluído' : 'Aguardando Parceiro'}
                         </span>
                         
                         {!isConcluido && (
                           <div className="flex gap-2 mt-2 sm:mt-0">
-                            <button onClick={() => handleSimularEntrega(agendamento.id)} title="Apenas para demonstração" className="text-green-600 hover:text-white hover:bg-green-600 border border-green-200 p-2 rounded-lg transition-all flex items-center gap-1 text-xs font-bold">
-                               <CheckCircle className="h-4 w-4" /> <span className="sm:hidden">Confirmar</span>
-                            </button>
                             <button onClick={() => handleCancelarAgendamento(agendamento.id)} className="text-red-400 hover:text-red-600 hover:bg-red-50 border border-transparent p-2 rounded-lg transition-all flex items-center gap-1 text-xs font-bold">
                                <Trash2 className="h-4 w-4" /> <span className="sm:hidden">Cancelar</span>
                             </button>
