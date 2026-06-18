@@ -120,21 +120,19 @@ public class UserController {
             return ResponseEntity.ok("{\"mensagem\": \"Senha alterada com sucesso!\"}");
         }).orElse(ResponseEntity.status(404).body("{\"mensagem\": \"Usuário não encontrado.\"}"));
     }
-    @DeleteMapping("/reset-database")
-public ResponseEntity<String> resetDatabase() {
-    
-   
-    try (Connection connection = dataSource.getConnection();
-         Statement statement = connection.createStatement()) {
+    @GetMapping("/reset-database")
+    public ResponseEntity<String> resetDatabase() {
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement()) {
 
-    
-        String sql = "TRUNCATE TABLE tb_scheduling, tb_waste_item, tb_reward, tb_collection_point, tb_user CASCADE;";
-        
-        statement.execute(sql);
+            String sql = "TRUNCATE TABLE scheduling, waste_item, collection_point, \"user\" CASCADE;";
+            
+            statement.execute(sql);
 
-        return ResponseEntity.ok("Banco de dados limpo com sucesso (TRUNCATE).");
+            return ResponseEntity.ok("Banco de dados limpo com sucesso (TRUNCATE)!");
 
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Erro ao resetar o banco de dados: " + e.getMessage());
-    } } }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao resetar o banco de dados: " + e.getMessage());
+        }
+    } }
