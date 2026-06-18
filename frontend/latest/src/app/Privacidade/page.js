@@ -1,7 +1,15 @@
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+
 export default function PrivacidadePage() {
   return (
-    <div className="min-h-screen bg-[#f5f0e8] py-12 px-4 sm:px-6 lg:px-8 font-sans flex items-center justify-center">
-      <div className="max-w-3xl w-full bg-white rounded-3xl border border-[#a8c0a0]/30 shadow-xl p-8 md:p-12 text-[#1a2421] transform transition-all">
+    <div className="min-h-screen bg-[#f5f0e8] py-12 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-3xl mx-auto mb-6">
+        <Link href="/" className="inline-flex items-center gap-2 text-[#7d9b76] font-bold hover:text-[#5a7654] transition-colors">
+          <ArrowLeft size={20} /> Voltar ao Início
+        </Link>
+      </div>
+      <div className="max-w-3xl mx-auto w-full bg-white rounded-3xl border border-[#a8c0a0]/30 shadow-xl p-8 md:p-12 text-[#1a2421]">
         
         <div className="border-b border-[#a8c0a0]/20 pb-6 mb-8 text-center sm:text-left">
           <p className="text-xs font-semibold text-[#7d9b76] uppercase tracking-widest mb-1">

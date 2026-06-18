@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "./store/useAuthStore";
+import { useAuthStore } from "../store/useAuthStore";
 import { Leaf, Recycle, Calendar, Award, Flame, ArrowRight, Star, Store, MapPin, Box, CheckCircle } from "lucide-react";
 
 export default function HomePage() {
@@ -59,12 +59,16 @@ export default function HomePage() {
             >
               Começar Agora <ArrowRight className="h-5 w-5" />
             </Link>
-            <Link 
-              href="#como-funciona" 
-              className="flex items-center justify-center h-14 px-8 rounded-2xl text-base font-bold bg-white text-[#1a2421] border border-[#a8c0a0]/30 hover:bg-gray-50 transition-colors"
+            
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="flex items-center justify-center h-14 px-8 rounded-2xl text-base font-bold bg-white text-[#1a2421] border border-[#a8c0a0]/30 hover:bg-gray-50 transition-colors cursor-pointer"
             >
               Como Funciona?
-            </Link>
+            </button>
           </div>
         </div>
 

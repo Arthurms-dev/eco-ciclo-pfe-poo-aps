@@ -2,8 +2,8 @@
 import { Store, Eye, EyeOff, ArrowRight, ShieldCheck, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/useAuthStore';
-import api from '@/services/api';
+import { useAuthStore } from '../../../store/useAuthStore';
+import api from '../../../services/api';
 
 export default function ParceiroLoginPage() {
   const router = useRouter();
@@ -40,7 +40,6 @@ export default function ParceiroLoginPage() {
   return (
     <div className="min-h-screen bg-[#111815] flex items-center justify-center p-6 text-white relative overflow-hidden selection:bg-[#7d9b76]">
       
-      {/* Background corporativo escuro */}
       <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-[#7d9b76]/10 rounded-full blur-[120px] pointer-events-none"></div>
       
       <div className="w-full max-w-md bg-[#1a2421]/80 backdrop-blur-xl p-8 md:p-10 rounded-[2.5rem] border border-white/10 shadow-2xl relative z-10">
