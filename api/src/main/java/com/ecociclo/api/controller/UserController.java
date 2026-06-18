@@ -1,5 +1,7 @@
 package com.ecociclo.api.controller;
 
+import java.util.Map;
+import com.ecociclo.api.service.EmailService;
 import java.util.Date;
 import java.util.List;
 
@@ -43,6 +45,7 @@ public class UserController {
     @Autowired
     private UserService service;
 
+    @Autowired private EmailService emailService;
     @Autowired private SchedulingRepository schedulingRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private CollectionPointRepository collectionPointRepository;
@@ -100,7 +103,23 @@ public class UserController {
         service.deletar(id);
         return ResponseEntity.noContent().build();
     }
+    @PutMapping("/{id}/senha")
+    public ResponseEntity<?> alterarSenhaPerfil(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        return userRepository.findById(id).map(user -> {
+            String novaSenha = request.get("senha");
+            
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            user.setSenha(encoder.encode(novaSenha));
+            
+            userRepository.save(user);
 
+            new Thread(() -> {
+                emailService.enviarEmailSenhaAlterada(user.getEmail(), user.getNome());
+            }).start();
+
+            return ResponseEntity.ok("{\"mensagem\": \"Senha alterada com sucesso!\"}");
+        }).orElse(ResponseEntity.status(404).body("{\"mensagem\": \"Usuário não encontrado.\"}"));
+    }
     @DeleteMapping("/reset-database")
 public ResponseEntity<String> resetDatabase() {
     

@@ -1,7 +1,7 @@
 'use client';
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { User, Mail, Flame, Recycle, Award, MapPin, CalendarClock, Clock, Trash2, Camera, Phone } from "lucide-react";
+import { User, Mail, Flame, Recycle, Award, MapPin, CalendarClock, Clock, Trash2, Camera, Phone, Lock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore"; 
 import useSWR from 'swr';
@@ -18,6 +18,10 @@ export default function PerfilPage() {
   const [cidadeForm, setCidadeForm] = useState("Recife - PE");
   const [telefoneForm, setTelefoneForm] = useState("");
   const [fotoPerfil, setFotoPerfil] = useState(null);
+  
+  const [editandoSenha, setEditandoSenha] = useState(false);
+  const [novaSenha, setNovaSenha] = useState("");
+  const [confirmaSenha, setConfirmaSenha] = useState("");
 
   const { data: todosAgendamentos = [], mutate } = useSWR(`/agendamentos`, fetcher, { refreshInterval: 3000 });
 
@@ -64,12 +68,28 @@ export default function PerfilPage() {
 
   const handleSalvarPerfil = async (e) => {
     e.preventDefault();
-    const usuarioAtualizado = { ...usuarioLogado, nome: formatarNome(nomeForm), telefone: telefoneForm };
+
+    if (editandoSenha && novaSenha !== confirmaSenha) {
+      toast.error("As senhas não coincidem!");
+      return;
+    }
+
     try {
+      const usuarioAtualizado = { ...usuarioLogado, nome: formatarNome(nomeForm), telefone: telefoneForm };
       const response = await api.put(`/usuarios/${usuarioLogado.id}`, usuarioAtualizado);
       atualizarSessaoLocal({ ...response.data, nome: formatarNome(response.data.nome) });
-      toast.success("Informações atualizadas!");
+
+      if (editandoSenha && novaSenha) {
+        await api.put(`/usuarios/${usuarioLogado.id}/senha`, { senha: novaSenha });
+        toast.success("Perfil e senha atualizados! Verifique o seu e-mail.");
+      } else {
+        toast.success("Informações atualizadas com sucesso!");
+      }
+
       setEditando(false);
+      setEditandoSenha(false);
+      setNovaSenha("");
+      setConfirmaSenha("");
     } catch (err) {
       toast.error("Erro ao salvar alterações no servidor.");
     }
@@ -106,9 +126,7 @@ export default function PerfilPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-[#f5f0e8] p-6 md:p-10 font-sans text-[#1a2421]">
-      
       <div className="max-w-5xl mx-auto mb-8 animate-in fade-in slide-in-from-top-4 duration-700 flex flex-col md:flex-row items-start md:items-center gap-6">
-        
         <div className="relative group cursor-pointer" onClick={() => document.getElementById('upload-foto').click()}>
           <div className="h-24 w-24 rounded-full bg-gradient-to-tr from-[#7d9b76] to-[#a8c0a0] flex items-center justify-center shadow-lg text-white text-3xl font-black border-4 border-white overflow-hidden">
             {fotoPerfil ? (
@@ -174,10 +192,36 @@ export default function PerfilPage() {
                 </div>
               </div>
 
-              <div className="pt-4 flex justify-end gap-3 border-t border-[#a8c0a0]/10 mt-6">
+              <div className="pt-4 mt-6 border-t border-[#a8c0a0]/10">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-[11px] font-bold text-[#1a2421]/50 uppercase tracking-widest flex items-center gap-2">
+                    <Lock size={14} className="text-[#7d9b76]" /> Segurança da Conta
+                  </h3>
+                  {editando && !editandoSenha && (
+                    <button type="button" onClick={() => setEditandoSenha(true)} className="text-xs font-bold text-[#7d9b76] hover:underline bg-[#7d9b76]/10 px-3 py-1 rounded-lg">
+                      Alterar Senha de Acesso
+                    </button>
+                  )}
+                </div>
+
+                {editandoSenha && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4 animate-in fade-in slide-in-from-top-2">
+                    <div>
+                      <label className="block text-[11px] font-bold text-[#1a2421]/50 uppercase tracking-widest mb-2">Nova Senha</label>
+                      <input type="password" placeholder="Mínimo 6 caracteres" value={novaSenha} onChange={(e) => setNovaSenha(e.target.value)} className="w-full px-4 py-3 bg-white border border-[#a8c0a0]/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7d9b76] text-sm text-[#1a2421] transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-[#1a2421]/50 uppercase tracking-widest mb-2">Confirmar Nova Senha</label>
+                      <input type="password" placeholder="Repita a senha" value={confirmaSenha} onChange={(e) => setConfirmaSenha(e.target.value)} className="w-full px-4 py-3 bg-white border border-[#a8c0a0]/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7d9b76] text-sm text-[#1a2421] transition-all" />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 flex justify-end gap-3 border-t border-[#a8c0a0]/10 mt-2">
                 {editando ? (
                   <>
-                    <button type="button" onClick={() => { setEditando(false); setNomeForm(formatarNome(usuarioLogado.nome) || ""); setTelefoneForm(usuarioLogado.telefone || ""); }} className="px-6 py-2.5 rounded-xl text-xs font-bold border border-gray-300 text-gray-500 hover:bg-gray-50 transition-colors">Cancelar</button>
+                    <button type="button" onClick={() => { setEditando(false); setEditandoSenha(false); setNovaSenha(""); setConfirmaSenha(""); setNomeForm(formatarNome(usuarioLogado.nome) || ""); setTelefoneForm(usuarioLogado.telefone || ""); }} className="px-6 py-2.5 rounded-xl text-xs font-bold border border-gray-300 text-gray-500 hover:bg-gray-50 transition-colors">Cancelar</button>
                     <button type="submit" className="px-6 py-2.5 rounded-xl text-xs font-bold bg-[#7d9b76] text-white shadow-md hover:bg-[#6c8866] hover:-translate-y-0.5 transition-all">Salvar Alterações</button>
                   </>
                 ) : (
@@ -226,7 +270,6 @@ export default function PerfilPage() {
                         <span className={`px-3 py-1.5 text-[10px] uppercase tracking-widest font-black rounded-lg ${isConcluido ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                           {isConcluido ? 'Concluído' : 'Aguardando Parceiro'}
                         </span>
-                        
                         {!isConcluido && (
                           <div className="flex gap-2 mt-2 sm:mt-0">
                             <button onClick={() => handleCancelarAgendamento(agendamento.id)} className="text-red-400 hover:text-red-600 hover:bg-red-50 border border-transparent p-2 rounded-lg transition-all flex items-center gap-1 text-xs font-bold">

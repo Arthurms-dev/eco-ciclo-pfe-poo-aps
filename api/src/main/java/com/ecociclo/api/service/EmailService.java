@@ -1,6 +1,7 @@
 package com.ecociclo.api.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -16,11 +17,16 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
+    @Value("${spring.mail.username}")
+    private String emailRemetente;
+
     public void enviarEmailAgendamento(String emailDestino, String nome, LocalDateTime dataHora, String local, int pontosProjetados) {
         try {
             MimeMessage mensagem = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
 
+            helper.setFrom(emailRemetente);
+            
             helper.setTo(emailDestino);
             helper.setSubject("♻️ EcoCiclo - O seu descarte foi agendado!");
 
@@ -62,7 +68,9 @@ public class EmailService {
             mailSender.send(mensagem);
 
         } catch (MessagingException e) {
+
             System.err.println("Erro ao enviar e-mail B2C: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -71,6 +79,8 @@ public class EmailService {
             MimeMessage mensagem = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
 
+            helper.setFrom(emailRemetente);
+            
             helper.setTo(emailEmpresa);
             helper.setSubject("🔔 Alerta Logístico: Novo recebimento agendado (" + dataHora.format(DateTimeFormatter.ofPattern("dd/MM")) + ")");
 
@@ -127,6 +137,7 @@ public class EmailService {
 
         } catch (MessagingException e) {
             System.err.println("Erro ao enviar e-mail B2B: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -135,6 +146,8 @@ public class EmailService {
             MimeMessage mensagem = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
 
+            helper.setFrom(emailRemetente);
+            
             helper.setTo(emailDestino);
             helper.setSubject("🔒 EcoCiclo - Sua senha temporária de acesso");
 
@@ -170,6 +183,46 @@ public class EmailService {
 
         } catch (MessagingException e) {
             System.err.println("Erro ao enviar e-mail de recuperação: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    public void enviarEmailSenhaAlterada(String emailDestino, String nome) {
+        try {
+            MimeMessage mensagem = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
+
+            helper.setFrom(emailRemetente);
+            helper.setTo(emailDestino);
+            helper.setSubject("✅ EcoCiclo - A sua senha foi atualizada!");
+
+            String htmlTemplate = """
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f0e8; padding: 30px; border-radius: 15px; color: #1a2421;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h1 style="color: #7d9b76; margin: 0;">EcoCiclo</h1>
+                        <p style="font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #a8c0a0; margin: 0;">Segurança da Conta</p>
+                    </div>
+                    
+                    <div style="background-color: #ffffff; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                        <h2 style="margin-top: 0;">Atualização bem-sucedida</h2>
+                        <p style="line-height: 1.6; color: #4a5d45;">Olá, %s. Este e-mail serve para confirmar que a senha da sua conta EcoCiclo foi <strong>alterada com sucesso</strong> pelo painel do perfil.</p>
+                        
+                        <p style="font-size: 13px; color: #888; line-height: 1.5; margin-top: 20px;">
+                            <em>Se você não realizou esta alteração, entre em contato com o suporte imediatamente.</em>
+                        </p>
+                    </div>
+                    
+                    <p style="text-align: center; font-size: 12px; color: #a8c0a0; margin-top: 20px;">
+                        © 2026 EcoCiclo. Protegendo os seus dados e o planeta.
+                    </p>
+                </div>
+                """.formatted(nome.split(" ")[0]);
+
+            helper.setText(htmlTemplate, true);
+            mailSender.send(mensagem);
+
+        } catch (MessagingException e) {
+            System.err.println("Erro ao enviar e-mail de confirmação de senha: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
