@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Leaf, Eye, EyeOff } from 'lucide-react';
-
-import api from '../services/api';
+import { useAuthStore } from '@/store/useAuthStore';
+import api from '@/services/api';
 
 export default function RegisterPage() {
   const router = useRouter();

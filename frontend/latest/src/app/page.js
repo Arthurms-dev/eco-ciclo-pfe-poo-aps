@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from '@/store/useAuthStore';
 import { Leaf, Recycle, Calendar, Award, Flame, ArrowRight, Star, Store, MapPin, Box, CheckCircle } from "lucide-react";
 
 export default function HomePage() {

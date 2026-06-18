@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation"; 
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from '@/store/useAuthStore';
 import { Toaster } from "sonner";
 
 import { Providers } from "./providers"; 

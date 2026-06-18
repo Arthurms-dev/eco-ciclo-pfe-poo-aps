@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Store, CheckCircle, Clock, MapPin, Box, ArrowRightCircle, Search } from 'lucide-react';
 import useSWR from 'swr';
-import api from '../../services/api';
+import api from '@/services/api';
 import { toast } from 'sonner';
 
 const fetcher = (url) => api.get(url).then(res => res.data);

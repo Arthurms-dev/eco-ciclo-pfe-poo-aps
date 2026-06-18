@@ -2,8 +2,8 @@
 import { Store, Eye, EyeOff, ArrowRight, ShieldCheck, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '../../../store/useAuthStore';
-import api from '../../../services/api';
+import { useAuthStore } from '@/store/useAuthStore';
+import api from '@/services/api';
 
 export default function ParceiroLoginPage() {
   const router = useRouter();
